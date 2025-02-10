@@ -16,14 +16,14 @@ pd.set_option("display.max_colwidth", None)
 
 def encode_sentences(sentences, model, tokenizer):
     encoded_input = tokenizer(
-        sentences, padding=True, truncation=True, return_tensors="pt"
+        sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
     ).to("cuda")
     with torch.no_grad():
         return (
             model(**encoded_input, return_dict=True)
             .pooler_output.cpu()
             .numpy()
-            .reshape(-1)
+            .reshape(len(sentences), -1)
         )
 
 
