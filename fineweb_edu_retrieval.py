@@ -85,6 +85,44 @@ def main():
     # High similarity score even for the lowest ranked paragraph!
     print(similarity_scores.min())
 
+    # Apply constrastive learning on the paragraphs
+    BATCH_SIZE = 16
+    dataset = paragraphs[:128]
+
+    encoder_model.train()
+    loss = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(encoder_model.parameters(), lr=0.001)
+    for epoch in trange(10, desc="Epochs"):
+        indecies = [
+            i
+            for i in range(
+                0,
+                len(dataset) // 2,
+            )
+        ]
+        np.random.shuffle(indecies)
+        for i in trange(0, len(indecies), BATCH_SIZE, desc="Batches"):
+            batch = [
+                [dataset[2 * i], dataset[2 * i + 1]]
+                for i in indecies[i : i + BATCH_SIZE]
+            ]
+            batch = [p for l in batch for p in l]
+            batch_tokenized = encoder_tokenizer(
+                batch, padding=True, truncation=True, return_tensors="pt"
+            ).to("cuda")
+
+            # 16 sentence pairs!
+            batch_encodings = encoder_model(**batch_tokenized).pooler_output
+            simialrities = batch_encodings @ batch_encodings.T
+
+            # Compute the cross entropy loss
+            batch_loss = loss(simialrities, torch.arange(simialrities.shape[0]).cuda())
+            print(batch_loss)
+            batch_loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+    print(indecies)
 
 if __name__ == "__main__":
     main()
