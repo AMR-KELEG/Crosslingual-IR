@@ -1,3 +1,9 @@
+## Answer/Passage retrieval using MS-MARCO
+The MS-MARCO dataset has queries (from user bing queries), relevant passages, and the answers. The queries' answer types are taxonomized into: description, numeric, entity, location, person. I focus on the `description` queries since they are more relevant to an exploratory knowledge seeking, the application I can see as useful for CrossLingual IR (CLIR).
+
+#### Experiment (1)
+- Setup: retrieve the correct answer(s) for each query.
+
 ## Zero-shot retrieval of multilingual passages using XQUAD-r
 1. Downloading the datasets: `python download_datasets.py`
 2. Running the zero-shot xlm-roberta baseline: `python run_baseline.py`
