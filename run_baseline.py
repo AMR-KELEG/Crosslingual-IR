@@ -14,10 +14,10 @@ from transformers import AutoModel, AutoTokenizer
 pd.set_option("display.max_colwidth", None)
 
 
-def encode_sentences(sentences, model, tokenizer):
+def encode_sentences(sentences, model, tokenizer, device="cuda"):
     encoded_input = tokenizer(
         sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
-    ).to("cuda")
+    ).to(device)
     with torch.no_grad():
         return (
             model(**encoded_input, return_dict=True)
@@ -27,9 +27,13 @@ def encode_sentences(sentences, model, tokenizer):
         )
 
 
-def get_relevant_docs(question, encoder_model, encoder_tokenizer, paragraphs_matrix):
-    question_encoding = encode_sentences([question], encoder_model, encoder_tokenizer)
-    question_encoding = torch.Tensor(question_encoding).cuda()
+def get_relevant_docs(
+    question, encoder_model, encoder_tokenizer, paragraphs_matrix, device="cuda"
+):
+    question_encoding = encode_sentences(
+        [question], encoder_model, encoder_tokenizer, device
+    )
+    question_encoding = torch.Tensor(question_encoding).cuda(device)
     scores = torch.nn.functional.cosine_similarity(paragraphs_matrix, question_encoding)
     return scores.argsort(descending=True)[:10].cpu().numpy()
 
