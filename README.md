@@ -4,6 +4,9 @@ The MS-MARCO dataset has queries (from user bing queries), relevant passages, an
 #### Experiment (1)
 - Setup: retrieve the correct answer(s) for each query.
 
+#### Notes
+- The evaluation metric `MRR@10` follows the metric used in the official passage-retrieval leaderboard: https://github.com/microsoft/MSMARCO-Passage-Ranking/blob/master/ms_marco_eval.py#L107
+
 ## Zero-shot retrieval of multilingual passages using XQUAD-r
 1. Downloading the datasets: `python download_datasets.py`
 2. Running the zero-shot xlm-roberta baseline: `python run_baseline.py`

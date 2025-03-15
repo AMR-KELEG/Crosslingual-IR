@@ -11,19 +11,36 @@ class MS_MARCO(Dataset):
 
         dataset = datasets.load_dataset(dataset_name, version, split=split)
         df = dataset.to_pandas()
+        df = df[df["query_type"] == "description"]
+
+        # Filter out the queries with no answers
+        df = df[df["answers"].apply(lambda l: len(l) > 0)]
+
+        df.reset_index(drop=True, inplace=True)
 
         # Extract the queries and relevant documents
         self.queries = df["query"]
         if answers_only:
-            self.docs = df["answers"].apply(lambda l: l.tolist())
+            self.relevant_docs = df["answers"].apply(lambda l: l.tolist())
         else:
-            self.docs = df["passages"].apply(lambda d: d["passage_text"].tolist())
+            self.relevant_docs = df["passages"].apply(
+                lambda d: d["passage_text"].tolist()
+            )
+
+        # Flatten the documents
+        self.docs = sorted(
+            set([doc for doc_list in self.relevant_docs for doc in doc_list])
+        )
+        self.doc_ids = {doc: i for i, doc in enumerate(self.docs)}
+        self.relevant_ids = [
+            [self.doc_ids[doc] for doc in doc_list] for doc_list in self.relevant_docs
+        ]
 
     def __len__(self):
         return len(self.queries)
 
     def __getitem__(self, idx):
-        return self.queries[idx], self.docs[idx]
+        return self.queries[idx], self.relevant_docs[idx]
 
 
 if __name__ == "__main__":
