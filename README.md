@@ -3,6 +3,13 @@ The MS-MARCO dataset has queries (from user bing queries), relevant passages, an
 
 #### Experiment (1)
 - Setup: retrieve the correct answer(s) for each query.
+- Model: use xlm-roberta (zero-shot) to encode the queries and answers.
+- Finding: poor performance on the 'train' split (MRR@10: 0.005). This matches previous findings [1].
+
+[1] Litschko, R., Vulić, I., Ponzetto, S. P., & Glavaš, G. (2022). On cross-lingual retrieval with multilingual text encoders. Information Retrieval Journal, 25(2), 149–183.
+
+#### Notes
+- The evaluation metric `MRR@10` follows the metric used in the official passage-retrieval leaderboard: https://github.com/microsoft/MSMARCO-Passage-Ranking/blob/master/ms_marco_eval.py#L107
 
 ## Zero-shot retrieval of multilingual passages using XQUAD-r
 1. Downloading the datasets: `python download_datasets.py`
